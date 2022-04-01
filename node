@@ -1,0 +1,232 @@
+1 node浏览器中js运行环境
+ 引擎负责解析和执行js代码
+ 内置API是运行环境提供的特殊接口。自拟在所属的运行环境中被调用
+
+2 什么是node
+ node是基于Chrome V8引擎的js运行环境
+ node无法调用DOM和BOM等浏览器内置API
+
+3 安装node
+ 查看node -v 
+ 路径 where node
+
+4 使用node运行js
+  esc删除单行
+  cls清空
+  tab快速补全
+
+5 fs读取文件内容
+ 用来操作文件的模块，提供哦一系列的方法和属性，用来满足用户对文件的操作需求
+ 
+ fs.writeFile()向指定文件中写入内容
+
+ 需要先导入 const fs=require('fs')
+
+ fs.readFile()方法读取指定文件中的内容
+ fs.readFile(path[,options],callback)
+ path 表示文件路径
+ options 可选 编码格式来读取文件
+ callback 文件读取完成后，通过回调函数拿到结果
+ fs.readFile('./node','utf8', function (err, dataStr) {
+ 读取成功则err为null
+ 失败err为错误对象 dataStr为undefined
+
+6 写入内容
+ fs.writeFile(path,data[,options],callback)
+ data 要写入的内容
+
+7 整理成绩案例
+ 导入需要的fs文件系统模块
+ 使用read读取文件
+ 判断是否读取成功
+ 处理成绩数据
+ 处理完成的成绩数据，调用fs.writeFile写入到新文件
+
+8 处理路径问题
+ 执行node时会以命令所处的目录来动态拼接被操作文件的路径
+
+ 直接提供完整路径
+
+ __dirname表示当前文件所处的目录
+ __dirname+'/xxx'
+
+9 path 使用path模块处理路径
+ path模板是用来处理路径的模块
+ 导入 const path = require('path')
+
+ path.join() 用来将多个路径片段拼接成一个完整的路径字符串
+ path.join('/a','/b','../') \a ../会撤销上一个
+ path.join(__dirname,'xx')
+
+ path.basename(),用来从路径字符串中,将文件名解析出来
+ path.basename(path[,ext])
+ path 一个路径的字符串
+ ext 可选 表示文件扩展名 删除扩展
+ 返回 路径中最后一部分
+
+ path.extname(path) 获取路径中的文件扩展名
+
+11 时钟案例 分析需求 读取文件内容
+ exec()如果找到了匹配的文本，则返回一个结果数组否则返回null
+ 此数组的第0个元素是与正则表达式相匹配的文本 
+ 
+ 1 创建两个正则表达式，分别用来匹配style 和script
+ 2 使用fs模块，读取需要被处理的HTML文件
+ 3 自定义resolveCSS方法，来写入index.css样式文件
+ 4 自定义resolveJS 方法，来写入index.js脚本文件
+ 5 自定义resolveHTML方法，来写入index.html文件 
+ 
+ \s表示空白字符 \S表示非空白字符 *表示匹配任意次
+ const regStyle=/<style>[\s\S]*<\/style>/
+ 
+12 处理css、js、html
+
+13 两个注意点
+
+14 理解http模块的概念及作用
+
+15 服务器相关的概念
+
+16 创建最基本的web服务器
+
+17 根据不同的rul响应不同的html内容
+
+18 时钟web服务器的案例
+
+19 模块化的概念
+
+20 模块的分类 require的使用
+
+21 模块作用域和module对象
+
+22 module.exports对象的使用
+
+23 exports对象 
+
+24 exports和module.exports的使用误区
+
+25 CommonJS模块化规范
+
+26 包与npm 包的概念
+
+27 格式化时间的两种做法
+
+28 使用npm的其他注意点
+
+29 包管理配置文件
+
+30 解决包慢的问题
+
+31 包的分类 规范的包结构
+
+32 发布包 初始化基础的包结构
+
+33 格式化时间 main属性
+
+34 转义 还原HTML的方法
+
+35 模块化拆分 编写包的使用
+
+36 把包发布到npm
+
+37 模块的加载机制
+
+38 express 认识 express并创建基本额web服务器
+
+39 监听GET和POST请求 处理参数
+
+40 静态资源处理
+
+41 安装并使用nodemon
+42 路由 初识express中的路由
+
+43 路由的模块化
+
+44 中间件 中间件的概念和格式
+
+45 全局生效的中间件
+
+46 局部生效的中间件
+
+47 中间件的5个注意事项
+
+48 中间件的分类
+
+49 自定义中间件
+
+50 编写接口 创建基本的服务器 创建API路由模块
+
+51 编写GET接口
+
+52 编写POST接口
+
+53 基于cors解决接口跨域问题
+
+54 cors相关的三个响应头
+
+55 cors的简单请求与预检请求
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
