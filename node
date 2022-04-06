@@ -82,17 +82,72 @@
 12 处理css、js、html
 
 13 两个注意点
+ fs.writeFile()方法只能用来创建文件，不能用来创建路径
+
+ 重复调用fs.writeFile()写入同一个文件，新写入的内容会覆盖之前的旧内容
 
 14 理解http模块的概念及作用
+ http模块是用来创建web服务器的模块。通过http模块提供的http.createServer()方法 
+ 就可以方便的把一台普通电脑，变成一台web服务器，从而对外提供web资源服务
+ 先导入 const http=require('http')
 
 15 服务器相关的概念
+ 自己电脑 127.0.0.1 localhost
+
+ 域名服务器DNS就是提供ip地址和域名之间的转换服务的服务器
+ 
+ 每个端口号不能同时被多个web服务占用
+
+ URL中的80端口可以省略
 
 16 创建最基本的web服务器
+ 先导入 const http=require('http')
+
+ 调用http.createServer()方法，即可快速创建一个web服务器实例
+ const server=http.createServer()
+
+ 为服务器实例绑定request事件，监听客户端的请求
+ server.on('request',function(req,res){
+    console.log('s');
+ })
+
+ 启动服务器
+ server.listen(80,function(){
+    console.log('server running at http://127.0.0.1');
+ })
+ 
+ req是请求对象，包含了与客户端相关的数据和属性
+ 例如req.url 
+ req.method 是客户端的method请求类型
+
+ 如果想在事件处理函数中，访问与客户端相关的数据或属性
+  const str=`Your request is ${req.url},and ${req.method}`
+
+
+ res 响应对象
+ 如果想访问与服务器相关的数据或属性 
+ res.end(str)
+
+ 调用res.end()方法 向客户端发送中文内容的时候，会出现乱码问题
+ 设置响应头 Content-Type 的值为text/html;charset=utf-8
+ res。setHeader('Content-Type','text/html:charset=utf-8')
 
 17 根据不同的rul响应不同的html内容
+ 1 获取请求的url地址
+ 2 设置默认的响应内容为 404
+ 3 判断用户请求的是否为/或/index.html 
+ 4 判断用户请求是否为/about.html 
+ 5 设置响应头
+ 6 使用res.end()
 
 18 时钟web服务器的案例
+ 将资源的请求url地址映射为文件的存放路径
+ path.join(__dirname,url)
 
+ 4 读取文件的内容并响应给客户端
+
+ 5优化资源的请求路径
+  path.join(__dirname,'./clock',url)
 19 模块化的概念
 
 20 模块的分类 require的使用
