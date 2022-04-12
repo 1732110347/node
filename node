@@ -130,7 +130,7 @@
 
  调用res.end()方法 向客户端发送中文内容的时候，会出现乱码问题
  设置响应头 Content-Type 的值为text/html;charset=utf-8
- res。setHeader('Content-Type','text/html:charset=utf-8')
+ res.setHeader('Content-Type','text/html:charset=utf-8')
 
 17 根据不同的rul响应不同的html内容
  1 获取请求的url地址
@@ -148,66 +148,326 @@
 
  5优化资源的请求路径
   path.join(__dirname,'./clock',url)
-19 模块化的概念
 
+19 模块化的概念
+ 1 复用性
+ 2 可维护性
+ 3 按需加载
+ 
 20 模块的分类 require的使用
+ 内置模块 fs.path
+ const http=require('http')
+ 自定义模块 
+ const http=require('./x.js')
+ 第三方 
+ const mount=require('mount')
 
 21 模块作用域和module对象
+ 每个自定义模块都有一个module对象，里面存储了和当前模块有关的信息
 
 22 module.exports对象的使用
+ 在自定义模块中，可以使用module.exports对象,将模块内的成员共享出去,供外界使用
+
+ 外界用require()方法导入自定义模块时，得到的就是module.exports所指向的对象
 
 23 exports对象 
-
+ module.exports和exports相同
+  
 24 exports和module.exports的使用误区
-
+ 得到的永远是module.exports 
+ 
 25 CommonJS模块化规范
 
 26 包与npm 包的概念
+ 第三方模块指的是包
 
 27 格式化时间的两种做法
+ npm install 包的完整名称
+ npm i 
+
+ // 1. 导入需要的包
+ // 注意：导入的名称，就是装包时候的名称
+ const moment = require('moment')
+
+ const dt = moment().format('YYYY-MM-DD HH:mm:ss')
+ console.log(dt)
 
 28 使用npm的其他注意点
+ node_modules 存放已安装到项目的包
+ json 记录每一个包的下载信息，例如名字、版本号、下载地址
+
+ 下载特定版本 xxx@xx
+
+ xx.xx.xx 第1位大版本 第2功能 3bug修改
 
 29 包管理配置文件
+ 创建json npm init -y 
+
+ dependencies节点 记录安装了哪些包
+
+ npm i 一次下全部
+
+ npm uninstall 卸载指定包
+
+ devDependencies
+ 只在项目开发阶段用到 npm i xx -D = xx --save-dev 
 
 30 解决包慢的问题
+ 查看当前下包源
+ npm config get registry 
+ https://registry.npmjs.org/
 
+ 切换为淘宝
+ npm config set registry=https://registry.npm.taobao.org/
+
+ 为方便切换下包源，安装nrm
+ npm i nrm -g 将nrm安装为全局可用的工具
+
+ nrm ls 查看所有可用的镜像源
+ 
+ nrm use taobao 切换为淘宝 
+ 
 31 包的分类 规范的包结构
+ -g 安装卸载全局包
+
+ 具有工具性质的包才有必要
+
+ i5ting_toc是一个把md转为html页面的小工具
+ npm install -g i5ting_toc 
+ 调用 i5ting_toc -f 要转换的md文件路径 -o 
+
+
+ 1包必须以单独的目录
+ 2目录下必须包含json这个包管理配置文件
+ 3json必须包含name，version，main这三个属性 包名、版本号、包的入口
 
 32 发布包 初始化基础的包结构
+ {
+  "name": "itheima-tools",
+  "version": "1.1.0",
+  "main": "index.js",
+  "description": "提供了格式化时间、HTMLEscape相关的功能",
+  "keywords": [
+    "itheima",
+    "dateFormat",
+    "escape"
+  ],
+  "license": "ISC"
+ }
 
 33 格式化时间 main属性
-
+ main为默认如果没写名字
+ 
 34 转义 还原HTML的方法
 
 35 模块化拆分 编写包的使用
 
 36 把包发布到npm
+ npm login 登录
+ npm publish 发布 
+
+ npm unpublish 包名 --force 
 
 37 模块的加载机制
+ 模块在第一次加载后会被缓存。多次调用require()不会导致模块的代码被执行多次
+ 无论是什么模块，都会优先缓存中加载
+
+ 内置模块的加载优先级最高
+
+ 加载自定义模块必须要./
+
+ 如果省略了扩展名
+ 1 按照确切的文件名进行加载
+ 2 补全.js扩展名进行加载
+ 3 补全.json扩展名进行加载
+ 4 补全.node扩展名进行加载
+ 5 加载失败，终端报错
+
+
+ 加载第三方模块
+ 会从当前模块的父目录开始，尝试从/node_modules文件夹中加载第三方模块
+ 如果没有找到对应的第三方模块,则移动到上一层父目录中，进行加载，直到文件系统的根目录
+
+
+ 当把目录作为模块标识符，传递给require()进行加载的时候，有三种加载方式
+ 1 在被加载的目录下查找一个叫做package.json文件，并寻找main属性，转为require()加载的入口
+ 2 如果目录里没有package.json文件，或者main入口不存在或无法解析，则node.js将会试图加载目录下的index.js文件 
+ 3 如果两边都失败了，则会打印错误
 
 38 express 认识 express并创建基本额web服务器
+ Web网站服务器:专门对外提供Web网页资源的服务器
+ API接口服务器：专门对外提供API接口的服务器
+
+ 安装 npm i express@4.17.1
+ 
+ 
+ const express =require('express')
+ 创建web服务器
+ const app =express()
+ 启动
+ app.listen(80,()=>{
+    console.log('express server running at http://127.0.0.1');
+ })
 
 39 监听GET和POST请求 处理参数
 
+ 参数1:客户端请求的URL地址
+ 参数2 req 请求对象
+      res 响应对象 
+ res.send()发送给客户端
+ 
+ app.get('/user',(req,res)=>{
+    res.send({name:'zs',age:20})
+ })
+
+ 通过req.query对象,可以访问到客户端通过查询字符串的形式，
+ 发送到服务器的参数
+
+
+ 获取URL中的动态参数
+ 通过req.params对象，可以访问到URL中,通过:匹配到的动态参数
+ app.get('/user/:id',(req,res)=>{
+
 40 静态资源处理
+ express.static()
+ 创建一个静态资源服务器 可以将xx目录下的文件对外开放
+ app.use(express.static('xxx'))
+
+ express在指定的静态目录中查找文件，并对外提供资源的访问路径
+ 因此，存放静态文件的目录名不会出现在URL中
+
+ 托管多个只需要多次调用
+ 按照添加顺序来查找
+
+
+ 如果希望在托管的静态资源访问路径之前，挂载路径前缀
+ app.use('/public',express.static('public'))
 
 41 安装并使用nodemon
+ npm i -g nodemon
+
 42 路由 初识express中的路由
+ express中,路由指的是客户端的请求与服务器处理函数之间的映射关系
+ Express 中的路由分3部分组成，分别是请求的类型、请求的URL地址、处理函数
+
+ app.METHOD(PATH,HANDLER)
+
+ 当一个请求到达服务器之后，需要先经过路由的匹配，匹配成功之后才会调用对应函数
+ 按照路由的顺序进行匹配，如果请求类型和请求的URL同时匹配成功，则Express会将这次请求 转交给对应function
+ 1 按照定义的先后顺序进行匹配
+ 2 请求类型和请求的URL同时匹配成功，才会调用对应的处理函数
+ 
 
 43 路由的模块化
+ 将路由抽离为单独的模块
+ 1 创建路由模块对应的js文件
+ 2 调用express.Router()函数创建路由对象
+ 3 向路由对象上挂载具体的路由 router.get
+ 4 module.exports 向外共享路由对象
+ 5 app.use() 函数注册路由模块
+
+ 为路由加前缀
+ app.use('/xx'router)
+
+ app.use()用来注册全局中间件
 
 44 中间件 中间件的概念和格式
+ Express的中间件，本质上上一个function处理函数
+ app.get('/',function(req,res,next){
+    next();
+ })
+ 中间件函数的形参列表中，必须包含next参数，而路由处理函数中只包含req和res
+
+ next函数调用将流转关系转给下一个中间件或路由
 
 45 全局生效的中间件
+ 客户端发起的任何请求，到达服务器之后，都会触发的中间件，叫做全局生效的中间件
+ 通过调用app.use(中间件函数)即课定义一个全局生效的中间件
+ 
+ 中间件的作用
+ 多个中间件之间，共享同一份req和res，可以在上游的中间件中，统一为req或res对象
+ 添加自定义的属性或方法，供下游的中间件或路由使用
+
+ 可以使用app.use()连续定义多个全局中间件。客户端请求到达服务器之后，
+ 会按照中间件定义的先后顺序
 
 46 局部生效的中间件
+ 不使用app.use()定义的叫局部
+ app.get('/',mw,function(req,res){})
+
+ 定义多个局部中间件
+ mw1,mw2 
+ [mw1,mw2]
 
 47 中间件的5个注意事项
+ 1 要在路由之前注册中间件
+ 2 客户端发送过来的请求，可以连续调用多个中间件进行处理
+ 3 执行完中间件的业务代码之后，不要忘记调用next()
+ 4 调用next之后不在写
+ 5 连续调用多个中间件，共享req和res
 
 48 中间件的分类
+ 1 应用级别的中间件
+ 绑定到app实例上的 use get post 
+
+ 2 路由级别的中间件
+ 绑定到express.Router实例
+
+ 3 错误级别的中间件
+ 专门用来捕获整个项目中发送的异常错误
+ 必须要四个参数(err,req,res,next)
+ app.use((err,req,res,next)=>{res.send(err.message)})
+ 注册在所有路由之后
+
+ 4 Express内置的中间件
+  1 express.static 快速托管静态资源的内置中间件 如html 图片
+  2 express.json 解析JSON格式的请求体数据
+  app.use(express.json())
+  req.body获取json发送的数据
+
+  3 express.urlencoded 解析URL-encoded格式的请求体数据
+  app.use(express.urlencoded({extended:false}))
+  req.body获取URL-encoded发送的数据
+
+ 5 第三方的中间件
+ 使用body-parser
+  1 运行npm install body-parser安装中间件
+  2 使用 require导入中间件
+  3 调用app.use()注册并使用中间件
+    app.use(xxx.urlencoded({extended:false}))
 
 49 自定义中间件
+ 手动模拟一个类似于express.urlencoded的中间件，来解析POST提交到服务器的表单数据
+ 1 定义中间件
+
+ 2 监听req的data事件
+ 如果数据量比较大，无法一次性发送完毕，则客户端会把数据切割后，分批发送到服务器
+ data可能会触发多次，每次触发都获取到数据只是完整数据的一部分，需要手动拼接
+   req.on('data', (chunk) => {
+    str += chunk
+  })
+
+ 3 监听req的end事件
+ 当请求体数据接收完毕后，会自动触发req的end事件
+ 可以在req的end事件中，拿到并处理完整的请求体数据
+  req.on('end', () => {
+
+ 4 使用querystring模块解析请求体数据
+ 专门用来处理查询字符串.通过这个模块提供的parse()函数，可以轻松把查询
+ 字符串，解析成对象的格式
+    const body = qs.parse(str)
+    
+
+ 5 将解析出来的对象挂载为req.body
+  req.body = body
+
+ 6 将自定义中间件封装为模块
+ const bodyParser = (req, res, next) => {
+    module.exports = bodyParser
+
+    const customBodyParser = require('./14.custom-body-parser')
+  // 2. 将自定义的中间件函数，注册为全局可用的中间件
+  app.use(customBodyParser)
 
 50 编写接口 创建基本的服务器 创建API路由模块
 
@@ -216,17 +476,80 @@
 52 编写POST接口
 
 53 基于cors解决接口跨域问题
+ 解决跨域问题
+ 1 CORS(主流的解决方案，推荐使用)
+ 2 JSONP(有缺陷，只支持GET)
+
+ 1 运行 npm install cors 安装中间件
+ 2 使用 const cors=require('cors') 导入 
+ 3 在路由之前调用app.use(cors()) 配置中间件
+
+ 跨域资源共享 由一系列HTTP响应头组成，这些HTTP响应头决定浏览器
+ 是否阻止前端JS代码跨域获取资源
+
+ 浏览器的同源安全策略默认会阻止网页跨域获取资源。但如果接口服务器配置了
+ CORS相关的响应头，就可以解除访问限制
+
+
+ 1 CORS主要在服务器端进行配置。客户端浏览器无需做任何额外的配置，就可以开启CORS接口
+ 2 有兼容性。只支持XMLHttpRequest Level2 如ie10 谷歌 火狐
 
 54 cors相关的三个响应头
+ Access-Control-Allow-Origin
+ 响应头部中可以携带一个Access-Control-Allow-Origin
+ Access-Control-Allow-Origin:<origin> | *
+ 其中origin参数的值指定了允许访问该资源的外域URL
+ res.setHeader('Access-Control-Allow-Origin','http://')
+
+Access-Control-Allow-Headers
+默认情况下,CORS仅支持客户端向服务器发送如下9个请求头
+如果客户端向服务器发送了额外的请求头信息,则需要在服务器端,通过
+Access-Control-Allow-Headers 对额外的请求头进行声明
+ res.setHeader('Access-Control-Allow-Headers','xxx')
+
+Access-Control-Allow-Methods
+如果客户端希望通过PUT、DELETE等方式请求服务器的资源，则需要在服务器端，通过
+Access-Control-Allow-Methods 来指明实际请求所允许使用的HTTP方法
 
 55 cors的简单请求与预检请求
+ 同时满足以下两大条件的请求，就属于简单请求
+ 1 请求方式GET、POST、HEAD 三者之一
+ 2 HTTP头部信息不超过以下几种字段:无自定义头部字段、9个请求头
+
+
+ 只要符合以下任何一个条件的请求，都需要进行预检请求
+ 1 请求方式为GET、POST、HEAD之外的请求Method类型
+ 2 请求头中包含自定义头部字段
+ 3 向服务器发送了 application/json 格式的数据
+
+ 在浏览器与服务器正式通信之前，浏览器会先发送OPTION请求进行预捡，
+ 以获知服务器是否允许该实际请求，服务器成功响应预捡请求之后才会
+ 发送真正的请求，并且携带真实数据
+
+
+ 简单请求的特点:客户端与服务器之间只会发送一次请求
+ 预捡请求的特点:客户端与服务器之间会发生两次请求，OPTION预捡请求成功之后，才会发起真正的请求
+
+56 编写jsonp接口
+ 浏览器通过<script>标签的src属性，请求服务器上的数据，同时，服务器返回一个函数
+ 的调用。这种请求数据的方式叫做JSONP
+
+ 特点：
+ 1 不属于真正的Ajax请求，以为它没有使用XMLHttpRequest 这个对象
+ 2 JSONP仅支持GET 请求
+
+ 创建JSONP接口的注意事项
+ 如果项目中已经配置了CORS跨域资源共享，为了防止冲突，必须在配置CORS中间件之前
+ 声明JSONP的接口。否则JSONP接口会被处理成开启CORS的接口
 
 
 
-
-
-
-
+ 实现JSONP接口的步骤
+ 1 获取客户端发送过来的回调函数的名字
+ 2 得到要通过JSONP 形式发送给客户端的数据
+ 3 根据前两步得到的数据，拼接出应该函数调用的字符串
+ 4 把上一步拼接得到的字符串，响应给客户端的<script>标签进行解析执行
+ 
 
 
 
