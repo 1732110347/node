@@ -21,18 +21,246 @@
 67 演示如何保存和打开sql
 
 68 安装配置mysql
+ npm install mysql
+
 
 69 查询和插入
+ 执行查询返回的是数组
+ 
+  // 注意：如果执行的是 insert into 插入语句，则 results 是一个对象
+ const user = { username: 'Spider-Man', password: 'pcc123' }
+ // 定义待执行的 SQL 语句
+ const sqlStr = 'insert into users (username, password) values (?, ?)'
+ // 执行 SQL 语句
+
+ db.query(sqlStr, [user.username, user.password], (err, results) => {
+
+       // 可以通过 affectedRows 属性，来判断是否插入数据成功 表示影响的行数
+
+  if (results.affectedRows === 1) {
+    console.log('插入数据成功!')
+  }
+
+  便携方式
+  向表中新增数据时，如果数据对象的每个属性和数据表的字段一一对应
+  insert into user set ?
+   db.query(sqlStr, user, (err, results) => {
 
 70 更新和删除数据
+ const sqlStr = 'update users set username=?, password=? where id=?'
+ 
+ 便携更新
+ /* const user = { id: 6, username: 'aaaa', password: '0000' }
+ // 定义 SQL 语句
+ const sqlStr = 'update users set ? where id=?'
+ // 执行 SQL 语句
+ db.query(sqlStr, [user, user.id], (err, results) => {
+
+ 删除
+ /* const sqlStr = 'delete from users where id=?'
+
+ 标记删除
+  const sqlStr = 'update users set status=? where id=?'
+
+71 web开发模式
+ 服务端渲染的概念 服务器发送给客户端的HTML页面，是在服务器通过字符串的拼接，动态生成的。
+ 因此，客户端不需要使用Ajax这样的技术额外请求页面的数据
+
+ 优点
+ 1 前端耗时少。以为服务器端负责动态生成HTML内容，浏览器只需要直接渲染页面即可。尤其是移动端，省电
+ 2 有利于SEO，因为服务器端响应的是完整的HTML页面内容，所以爬虫更容易爬取获得信息，有利于SEO
+
+ 缺点
+ 1 占用服务器端资源。即服务器端完成HTML页面内容的拼接，如果请求较多，会对服务器造成一定的访问压力
+ 2 不利于前后端分离，开发效率低。使用服务器端渲染，则无法进行分工合作，
+
+72 身份认证
+ 1 服务端渲染推荐使用Session认证机制
+ 2 前后端分离推荐使用JWT认证机制
+
+73 session原理
+ 1HTTP协议的无状态性
+ HTTP协议的无状态性，指的是客户端每次HTTP请求都是独立的，连续多个请求没有直接关系
+ 服务器不会主动保留每次HTTP请求的状态
+
+ Cookie
+ 由一个名称Name、一个值Value和其他几个用于控制Cookie有效期、安全性、使用范围的可选属性组成
+ 不同域名下的Cookie各自独立，每当客户端发起请求时，会自动把当前域名下所有未过期Cookie发送到服务器
+
+ 1 自动发送
+ 2 域名独立
+ 3 过期时限
+ 4 4kb限制
+
+ 客户端第一次请求服务器的时候，服务器通过响应头的形式，向客户端发送应该身份认证
+ 的Cookie，客户端会自动将Cookie保存在浏览器中
+ 随后，当客户端浏览器每次请求服务器的时候，浏览器会自动将身份认证相关的Cookie通过请求头
+ 的形式发送给服务器，服务器验明客户端身份
+ 
+ Cookie不具有安全性
+ 存储在浏览器中，而且浏览器也提供了读写Cookie的API，容易被伪造，不建议隐私数据
+
+74 session中间件的使用
+ 安装 npm install express-session 
+
+ 2 配置express-session 中间件
+ 安装完后，需要通过app.use()来注册session中间件
+ app.use(session({
+     secret:'keyboard cat', //secret 属性的值可以任意字符串
+     resave:false, //固定写法
+     saveUninitialized:true //固定写法
+ }))
+
+ 3 向session中存数据
+ 当express-session 中间件配置成功后，即可通过req.session 
+ 来访问和使用session对象，从而存储用户的关键信息
+
+ 才能够通过 req 点出来 session 这个属性
+
+ / 托管静态页面
+ app.use(express.static('./pages'))
+ // 解析 POST 提交过来的表单数据
+ app.use(express.urlencoded({ extended: false }))
+
+ // 登录的 API 接口
+ app.post('/api/login', (req, res) => {
+  // 判断用户提交的登录信息是否正确
+  if (req.body.username !== 'admin' || req.body.password !== '000000') {
+    return res.send({ status: 1, msg: '登录失败' })
+  }
+
+  // TODO_02：请将登录成功后的用户信息，保存到 Session 中
+  // 注意：只有成功配置了 express-session 这个中间件之后，才能够通过 req 点出来 session 这个属性
+  req.session.user = req.body // 用户的信息
+  req.session.islogin = true // 用户的登录状态
+
+  res.send({ status: 0, msg: '登录成功' })
+ })
+ 
+
+ 4 从session中取数据
+ // 获取用户姓名的接口
+ app.get('/api/username', (req, res) => {
+  // TODO_03：请从 Session 中获取用户的名称，响应给客户端
+  if (!req.session.islogin) {
+    return res.send({ status: 1, msg: 'fail' })
+  }
+  res.send({
+    status: 0,
+    msg: 'success',
+    username: req.session.user.username,
+  })
+ })
 
 
+ 5清空session
+ 调用req.session.destroy()函数，清空服务器保存的session信息
+ // 退出登录的接口
+ app.post('/api/logout', (req, res) => {
+  // TODO_04：清空 Session 信息
+  req.session.destroy()
+  res.send({
+    status: 0,
+    msg: '退出登录成功',
+  })
+ })
+
+75 jwt 了解token的原理
+ 1 Session 的局限性
+ 需要配合Cookie才能实现。由于Cookie默认不支持跨域访问，当涉及到前端跨域请求接口
+ 的时候，需要做好多额外的配置，才能实现跨域Session认证
+ 当前端请求后端接口不存在跨域问题的时候
+ 需要跨域请求后端接口的时候，推荐JWT
+
+ 用户的信息通过Token字符串的形式，保存在客户端浏览器中。服务器通过还原Token字符串的形式来认证用户的身份
+
+ JWT的组成
+ Header 头部 Payload 有效荷载、Signature 签名
+ 三者之间用英文.相隔 Header.Payload.Signature 
+ Payload部分才是真正的用户信息，它是用户信息经过加密之后生成的字符串
+ Header和Signature是安全性相关的部分，只是为了保证Token安全性
+
+ JWT的使用方式
+ 客户端收到服务器返回的JWT后，通常存储在localStorage或sessionStorage
+ 此后，客户端每次与服务器通信，都要带上JWT的字符串，从而进行身份认证。
+ 推荐吧JWT放在HTTP请求头的Authorization字段中
+ Authorization:Bearer <token>
+
+76 在express中生成token 
+ 安装 npm install jsonwebtoken express-jwt
+ jsonwebtoken 用于生成JWT字符串
+ express-jwt 用于将JWT字符串解析还原成JSON对象
+
+ 导入相关包
+ const jwt = require('jsonwebtoken')
+ const expressJWT = require('express-jwt')
+
+ 定义secret密钥
+ 为了保证JWT字符串的安全性，定义一个用于加密和解密的secret密钥
+ 1 当生成JWT字符串的时候，需要使用secret密钥对用户的信息加密，最终得到加密好的JWT字符串
+ 2 把JWT字符串解析还原成JSON对象的时候，需要使用密钥进行解密
+
+ const secretKey='xxxx'
+
+ 4 在登录成功后生成JWT字符串
+ 调用jsonwebtoken包提供的sign()方法，将用户的信息加密成JWT字符串，响应给客户端
+  // TODO_03：在登录成功之后，调用 jwt.sign() 方法生成 JWT 字符串。并通过 token 属性发送给客户端
+  // 参数1：用户的信息对象
+  // 参数2：加密的秘钥
+  // 参数3：配置对象，可以配置当前 token 的有效期
+  // 记住：千万不要把密码加密到 token 字符中
+  const tokenStr = jwt.sign({ username: userinfo.username }, secretKey, { expiresIn: '30s' })
 
 
+ 5 将JWT字符串还原为JSON对象
+ 客户端每次在访问那些有权限接口的时候，都需要主动通过请求头中的 Authorization 字段
+ 将Token字符串发送到服务器进行身份认证
+ 此时，服务器可以通过express-jwt这个中间件，自动将客户端发送过来的Token解析还原成JSON对象
+ 使用app.use()来注册中间件
+ expressJWT({secret:secretKey}) 就是用来解析Token的中间件
+ .unless({path:[/^\/api\//]})指定哪些接口不需要访问权限
+   只要配置成功了 express-jwt 这个中间件，就可以把解析出来的用户信息，挂载到 req.user 属性上
+ app.use(expressJWT({ secret: secretKey }).unless({ path: [/^\/api\//] }))
 
+77 初始化项目
 
+78 初始化路由模块
 
+79 开发注册用户的API接口
 
+80 代码优化
+
+81 开发登录的API接口
+
+82 token的生成与验证
+
+83 开发获取用户的基本信息的接口
+
+84 开发更新用户的接口
+
+85 开发重置密码的接口
+
+86 更换头像的接口
+
+87 总结
+
+88 新建数据表
+
+89 开发获取文章分类表的接口
+
+90 开发新增文章分类的接口
+
+91 开发根据id删除文章分类的接口
+
+92 根据id获取文章
+
+93 根据id更新
+
+94 新建文章表
+
+95 初始化发布文章的路由模块
+
+96 演示API接口的使用
 
 
 
