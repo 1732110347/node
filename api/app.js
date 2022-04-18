@@ -41,6 +41,24 @@ app.use('/my',userinfoRouter)
 
 
 
+
+
+// 导入并使用文章分类路由模块
+const artCateRouter = require('./router/artcate')
+// 为文章分类的路由挂载统一的访问前缀 /my/article
+app.use('/my/article', artCateRouter)
+
+
+
+
+
+
+
+
+
+
+
+
 app.use((err, req, res, next) => {
     // 验证失败导致的错误
     if (err instanceof joi.ValidationError) return res.cc(err)
